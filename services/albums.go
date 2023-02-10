@@ -17,6 +17,16 @@ func GetAlbums() (arr *[]models.Album) {
 	return &albums
 }
 
+// Get album with gettin ID
+func GetAlbum(id *string) (album *models.Album) {
+	for _, a := range albums {
+		if a.ID == *id {
+			return &a
+		}
+	}
+	return nil
+}
+
 // Add new row into db
 func PostAlbums(c *gin.Context) *error {
 	var newAlbum models.Album

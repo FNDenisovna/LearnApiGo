@@ -1,5 +1,5 @@
 definitions:
-  main.album:
+  models.Album:
     properties:
       artist:
         type: string
@@ -13,6 +13,22 @@ definitions:
 info:
   contact: {}
 paths:
+  /album/{id}:
+    get:
+      parameters:
+      - description: Album ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Album'
+      summary: Retrieves album with ID
   /albums:
     get:
       produces:
@@ -22,7 +38,25 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/main.album'
+              $ref: '#/definitions/models.Album'
             type: array
       summary: Retrieves all albums
+    post:
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.Album'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Adds an album to db from JSON received in the request body
 swagger: "2.0"

@@ -41,6 +41,7 @@ func main() {
 	{
 		//v1.Use(auth())
 		v1.GET("/albums", apis.GetAlbums)
+		v1.GET("/album/:id", apis.GetAlbum)
 		v1.POST("/albums", apis.PostAlbums)
 	}
 
