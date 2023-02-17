@@ -1,7 +1,9 @@
 package services
 
 import (
+	"LearnApiGo/config"
 	"LearnApiGo/models"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +31,7 @@ func GetAlbum(id *string) (album *models.Album) {
 
 // Add new row into db
 func PostAlbums(c *gin.Context) *error {
+	log.Printf("In PostAlbums")
 	var newAlbum models.Album
 
 	// Call BindJSON to bind the received JSON to
@@ -36,8 +39,18 @@ func PostAlbums(c *gin.Context) *error {
 	if err := c.BindJSON(&newAlbum); err != nil {
 		return &err
 	}
-
+	log.Printf("In PostAlbums getting album")
 	// Add the new album to the slice.
-	albums = append(albums, newAlbum)
+	//albums = append(albums, newAlbum)
+
+	//var inInterface map[string]interface{}
+	//encoding struct to bytes
+	//inrec, _ := json.Marshal(newAlbum)
+	//decoding bytes to map
+	//json.Unmarshal(inrec, &inInterface)
+	if err := config.InsertAlbum(&newAlbum); err != nil {
+		//return err
+	}
+
 	return nil
 }

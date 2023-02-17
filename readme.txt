@@ -10,7 +10,7 @@ curl http://localhost:8080/albums \
 
 
 # POST "/albums" add new row to albums
-curl.exe -i -X POST -H "Content-Type: application/json" -d "@body.json" http://localhost:8080/albums
+curl.exe -i -X POST -H "Content-Type: application/json" -d "@body.json" http://localhost:8080/api/v1/albums
 
 curl http://localhost:8080/albums \
     --include \
