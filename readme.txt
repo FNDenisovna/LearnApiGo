@@ -1,3 +1,7 @@
+#to generate swagger info and correct detected models
+#run
+PS D:\LearnApiGo> swag init -g internal/apis/endpoint.go
+
 # GET "/albums" retrun all albums in db
 curl http://localhost:8080/albums -X GET -H @{ "content-type" = "application/json"} 
 curl.exe http://localhost:8080/albums -X GET -H "Content-Type: application/json"

@@ -29,8 +29,31 @@ paths:
           schema:
             $ref: '#/definitions/models.Album'
       summary: Retrieves album with ID
-  /albums:
+  /album/create:
+    post:
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Album'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Album'
+      summary: Adds an album to db from JSON received in the request body
+  /albums/{limit}:
     get:
+      parameters:
+      - description: Limit
+        in: path
+        name: limit
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -41,22 +64,4 @@ paths:
               $ref: '#/definitions/models.Album'
             type: array
       summary: Retrieves all albums
-    post:
-      parameters:
-      - description: query params
-        in: body
-        name: request
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/models.Album'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Adds an album to db from JSON received in the request body
 swagger: "2.0"

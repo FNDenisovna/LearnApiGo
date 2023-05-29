@@ -15,6 +15,33 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/album/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Adds an album to db from JSON received in the request body",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Album"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Album"
+                        }
+                    }
+                }
+            }
+        },
         "/album/{id}": {
             "get": {
                 "produces": [
@@ -40,48 +67,29 @@ const docTemplate = `{
                 }
             }
         },
-        "/albums": {
+        "/albums/{limit}": {
             "get": {
                 "produces": [
                     "application/json"
                 ],
                 "summary": "Retrieves all albums",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Album"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Adds an album to db from JSON received in the request body",
                 "parameters": [
                     {
-                        "description": "query params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Album"
-                            }
-                        }
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Album"
+                            }
                         }
                     }
                 }
