@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package grpc;
+option go_package = "./grpc";
+
+service GrpcAlbum {
+    rpc GetAlbum(GetAlbumRequest) returns (Album) {}
+	rpc GetAlbums(GetAlbumsRequest) returns (GetAlbumsResponse) {}
+	rpc CreateAlbum(Album) returns (Album) {}
+}
+
+message GetAlbumsRequest {
+	int32 limit = 1;
+}
+
+message GetAlbumsResponse {
+	repeated Album albums = 1;
+}
+
+message GetAlbumRequest {
+	string id = 1;
+}
+
+message Album {
+	string  id = 1;
+	string  title = 2;
+	string  artist = 3;
+	float price = 4;
+}
+
+//GetAlbums(limit int) (*[]models.Album, error)
+//	GetAlbum(id *uuid.UUID) (*models.Album, error)
+//	CreateAlbum(album *models.Album) error
+
+/*protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative grpc/album.proto*/

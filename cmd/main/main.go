@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 
 	"LearnApiGo/internal/apis"
+	"LearnApiGo/internal/grpc"
 	repo "LearnApiGo/internal/repository/postgres"
 	services "LearnApiGo/internal/services"
 	storage "LearnApiGo/pkg/storage/postgres"
@@ -17,6 +18,7 @@ func init() {
 	viper.AutomaticEnv()
 	viper.SetDefault("SERVICE_NAME", "albumService")
 	viper.SetDefault("HTTP_PORT", 8080)
+	viper.SetDefault("GRPC_PORT", 8000)
 }
 
 func main() {
@@ -29,7 +31,8 @@ func main() {
 
 	db := repo.New(conn.Pool)
 	service := services.New(db)
-	apis.New(service)
+	go apis.New(service)
+	go grpc.New(service)
 
 	defer conn.Pool.Close()
 

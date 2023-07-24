@@ -11,6 +11,7 @@ type IAlbums interface {
 	GetAlbums(limit int) (*[]models.Album, error)
 	GetAlbum(id *uuid.UUID) (*models.Album, error)
 	CreateAlbum(album *models.Album) error
+	Authenticate(login string, pass string) (bool, error)
 }
 
 type Service struct {

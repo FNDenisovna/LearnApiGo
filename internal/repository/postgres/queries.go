@@ -66,7 +66,8 @@ func (db *Repository) SelectAlbums(limit int) (*[]models.AlbumRow, error) {
 func (db *Repository) SelectAlbum(id *uuid.UUID) (*models.AlbumRow, error) {
 	query := "SELECT id, title, artist, price FROM public.album WHERE id = @id"
 	args := pgx.NamedArgs{
-		"id": id}
+		"id": id,
+	}
 
 	var res models.AlbumRow
 	err := db.db.QueryRow(context.Background(), query, args).Scan(&res.Id, &res.Title, &res.Artist, &res.Price)
@@ -77,4 +78,21 @@ func (db *Repository) SelectAlbum(id *uuid.UUID) (*models.AlbumRow, error) {
 	}
 
 	return &res, nil
+}
+
+func (db *Repository) SelectUser(login string) ([]byte, error) {
+	query := "SELECT pass FROM public.user WHERE login = @Login"
+	args := pgx.NamedArgs{
+		"Login": login,
+	}
+
+	var pass string
+	err := db.db.QueryRow(context.Background(), query, args).Scan(&pass)
+
+	if err != nil {
+		log.Printf("Error exec getting row from database: %v\n", err)
+		return nil, err
+	}
+
+	return []byte(pass), nil
 }

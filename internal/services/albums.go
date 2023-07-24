@@ -3,6 +3,8 @@ package services
 import (
 	"LearnApiGo/internal/models"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/google/uuid"
 )
 
@@ -55,4 +57,17 @@ func (s *Service) CreateAlbum(album *models.Album) error {
 
 	album.Id = row.Id.String()
 	return nil
+}
+
+func (s *Service) Authenticate(login string, pass string) (bool, error) {
+	actual, err := s.storage.SelectUser(login)
+	if err != nil {
+		return false, err
+	}
+
+	compare := []byte(pass)
+	if cmperr := bcrypt.CompareHashAndPassword(actual, compare); cmperr == nil {
+		return true, nil
+	}
+	return false, nil
 }

@@ -32,10 +32,10 @@ type Api struct {
 	//server  *http.Server
 }
 
-const port string = "8080"
+var addr *string
 
 func New(service services.IAlbums) {
-	addr := flag.String("addr", ":8080", "HTTPS network address")
+	addr = flag.String("addr", ":8080", "HTTPS network address")
 	certFile := flag.String("certfile", "cert.pem", "certificate PEM file")
 	keyFile := flag.String("keyfile", "key.pem", "key PEM file")
 	flag.Parse()
@@ -81,12 +81,14 @@ func New(service services.IAlbums) {
 		serverStopCtx()
 	}()
 
-	fmt.Printf("Service started successfully on http port: %s\n", port)
 	// Run the server
-	err := srv.ListenAndServeTLS(*certFile, *keyFile)
-	if err != nil && err != http.ErrServerClosed {
-		log.Fatal(err)
-	}
+	go func() {
+		err := srv.ListenAndServeTLS(*certFile, *keyFile)
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatal(err)
+		}
+	}()
+	fmt.Printf("Service started successfully on http port %s\n", *addr)
 
 	// Wait for server context to be stopped
 	<-serverCtx.Done()
@@ -107,7 +109,7 @@ func getHandler(api *Api) http.Handler {
 	//r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("https://localhost:"+port+"/swagger/doc.json"),
+		httpSwagger.URL("https://localhost"+*addr+"/swagger/doc.json"),
 	))
 
 	// Public Routes
@@ -122,7 +124,7 @@ func getHandler(api *Api) http.Handler {
 			r.Get("/", api.GetAlbum)
 		})
 
-		r.With(BasicAuth).Post("/album/create", api.CreateAlbum)
+		r.With(api.BasicAuth).Post("/album/create", api.CreateAlbum)
 
 		r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("pong"))
@@ -131,7 +133,7 @@ func getHandler(api *Api) http.Handler {
 
 	// Private Routes
 	// Require Authentication
-	r.Group(func(r chi.Router) {
+	/*r.Group(func(r chi.Router) {
 
 		r.Post("/secret/", func(w http.ResponseWriter, req *http.Request) {
 			user, pass, ok := req.BasicAuth()
@@ -143,7 +145,7 @@ func getHandler(api *Api) http.Handler {
 			}
 		})
 
-		/*r.Get("/slow", func(w http.ResponseWriter, r *http.Request) {
+		r.Get("/slow", func(w http.ResponseWriter, r *http.Request) {
 			// Simulates some hard work.
 			//
 			// We want this handler to complete successfully during a shutdown signal,
@@ -154,8 +156,8 @@ func getHandler(api *Api) http.Handler {
 			time.Sleep(5 * time.Second)
 
 			w.Write([]byte(fmt.Sprintf("all done.\n")))
-		})*/
-	})
+		})
+	})*/
 
 	return r
 }
