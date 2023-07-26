@@ -2,6 +2,10 @@ package main
 
 //swagger https://github.com/swaggo/swag#general-api-info
 import (
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/spf13/viper"
 
 	"LearnApiGo/internal/apis"
@@ -34,9 +38,9 @@ func main() {
 	go apis.New(service)
 	go grpc.New(service)
 
-	defer conn.Pool.Close()
-
-	/*signalCh := make(chan os.Signal, 1)
+	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
-	<-signalCh*/
+	<-signalCh
+
+	defer conn.Pool.Close()
 }

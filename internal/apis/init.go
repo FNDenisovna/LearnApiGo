@@ -88,7 +88,7 @@ func New(service services.IAlbums) {
 			log.Fatal(err)
 		}
 	}()
-	fmt.Printf("Service started successfully on http port %s\n", *addr)
+	fmt.Printf("Http-service started successfully on http port %s\n", *addr)
 
 	// Wait for server context to be stopped
 	<-serverCtx.Done()

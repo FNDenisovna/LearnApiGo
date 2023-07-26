@@ -137,6 +137,9 @@ github.com/swaggo/http-swagger/v2
 # github.com/swaggo/swag v1.8.1
 ## explicit; go 1.18
 github.com/swaggo/swag
+# github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
+## explicit; go 1.12
+github.com/t-tomalak/logrus-easy-formatter
 # golang.org/x/crypto v0.6.0
 ## explicit; go 1.17
 golang.org/x/crypto/bcrypt

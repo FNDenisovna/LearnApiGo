@@ -1,36 +1,49 @@
 package grpc
 
 import (
-	"LearnApiGo/internal/grpc/handler"
+	handler "LearnApiGo/internal/grpc/handler"
 	"LearnApiGo/internal/grpc/proto"
 	"LearnApiGo/internal/services"
-	"flag"
+	"fmt"
+	"io"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/sirupsen/logrus"
+	easy "github.com/t-tomalak/logrus-easy-formatter"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
 	srv *grpc.Server
 	ServerSet
-	handl         *handler.GrpcAlbumHandler
+	handl         proto.GrpcAlbumServer
 	albumServices services.IAlbums
 }
 
 type ServerSet struct {
-	addr        *string
+	addr        string
 	logrusEntry *logrus.Entry
 }
 
-func New(service services.IAlbums) {
-	logrusLogger := logrus.New()
-	settings := &ServerSet{
-		addr: flag.String("addr", ":8000", "HTTPS network address"),
+var addr = ":8000"
 
+func New(service services.IAlbums) {
+	logrusLogger := &logrus.Logger{
+		Out:   io.MultiWriter(os.Stdout),
+		Level: logrus.DebugLevel,
+		Formatter: &easy.Formatter{
+			TimestampFormat: "2006-01-02 15:00:00",
+			LogFormat:       "[%lvl%]: %time% - %msg%\n",
+		},
+	}
+	settings := &ServerSet{
+		addr:        addr,
 		logrusEntry: logrus.NewEntry(logrusLogger),
 	}
 	server := &Server{
@@ -46,15 +59,26 @@ func New(service services.IAlbums) {
 				grpc_recovery.UnaryServerInterceptor(),
 			)),
 		), //, authStream  , authUnary
-		handl: handler.New(service),
+		handl:     handler.New(service),
+		ServerSet: *settings,
 	}
 
-	server.ListenAndServe()
+	go func(s *Server) {
+		err := server.ListenAndServe()
+		if err != nil {
+			fmt.Printf("Grpc-service has errors on start: %v\n", err)
+		}
+		signalCh := make(chan os.Signal, 1)
+		signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
+		<-signalCh
+		defer s.Close()
+	}(server)
 }
 
 func (s *Server) ListenAndServe() error {
-	listner, err := net.Listen("tcp", *s.addr)
-	defer s.Close()
+	fmt.Printf("Grpc-service started successfully on http port %s\n", s.addr)
+
+	listner, err := net.Listen("tcp", s.addr)
 
 	if err != nil {
 		return err
@@ -64,6 +88,7 @@ func (s *Server) ListenAndServe() error {
 	if err := s.srv.Serve(listner); err != nil {
 		return err
 	}
+
 	return nil
 }
 
